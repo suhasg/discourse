@@ -1043,5 +1043,5 @@ a.attachment:before {
 }
 
 span.highlighted {
-  background-color: $highlight;
+  background-color: scale-color($highlight, $lightness: 70%);
 }
