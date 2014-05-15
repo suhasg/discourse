@@ -95,12 +95,12 @@ gem 'barber'
 gem 'message_bus'
 gem 'rails_multisite', path: 'vendor/gems/rails_multisite'
 
-gem 'redcarpet', require: false
+# gem 'redcarpet', require: false
 gem 'airbrake', '3.1.2', require: false # errbit is broken with 3.1.3 for now
 gem 'eventmachine'
-gem 'fast_xs'
+gem 'fast_xs', platform: :mri
 
-gem 'fast_xor'
+gem 'fast_xor', platform: :mri
 gem 'fastimage'
 gem 'fog', '1.18.0', require: false
 gem 'unf', require: false
@@ -125,18 +125,20 @@ gem 'nokogiri'
 gem 'omniauth'
 gem 'omniauth-openid'
 gem 'openid-redis-store'
-gem 'omniauth-facebook'
-gem 'omniauth-twitter'
-gem 'omniauth-github'
-gem 'omniauth-oauth2', require: false
-gem 'oj'
+# gem 'omniauth-facebook'
+# gem 'omniauth-twitter'
+# gem 'omniauth-github'
+# gem 'omniauth-oauth2', require: false
+gem 'oj', platform: :mri
+
 # while resolving https://groups.google.com/forum/#!topic/ruby-pg/5_ylGmog1S4
-gem 'pg', '0.15.1'
+gem 'pg', '0.15.1', platform: :mri
+gem 'pg_jruby', require: 'pg', platform: :jruby
 gem 'rake'
 
 
 gem 'rest-client'
-gem 'rinku'
+gem 'rinku', platform: :mri
 gem 'sanitize'
 gem 'sass'
 gem 'sidekiq'
@@ -144,8 +146,9 @@ gem 'sidekiq'
 gem 'sinatra', require: nil
 gem 'slim'  # required for sidekiq-web
 
-gem 'therubyracer'
-gem 'thin', require: false
+gem 'therubyracer', platform: :mri
+gem 'therubyrhino', platform: :jruby, require: 'rhino'
+gem 'thin', platform: :mri, require: false
 gem 'highline', require: false
 gem 'rack-protection' # security
 
@@ -183,7 +186,7 @@ end
 
 group :development do
   gem 'better_errors'
-  gem 'binding_of_caller'
+  gem 'binding_of_caller', platform: :mri
   gem 'librarian', '>= 0.0.25', require: false
   gem 'annotate'
   gem 'foreman', require: false
@@ -196,7 +199,7 @@ gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
 # this is an optional gem, it provides a high performance replacement
 # to String#blank? a method that is called quite frequently in current
 # ActiveRecord, this may change in the future
-gem 'fast_blank' #, github: "SamSaffron/fast_blank"
+gem 'fast_blank', platform: :mri #, github: "SamSaffron/fast_blank"
 
 # this provides a very efficient lru cache
 gem 'lru_redux'
@@ -205,12 +208,12 @@ gem 'lru_redux'
 #  If you want to amend mini profiler to do the monkey patches in the railstie
 #  we are open to it. by deferring require to the initializer we can configure discourse installs without it
 
-gem 'flamegraph', require: false
+gem 'flamegraph', require: false, platform: :mri
 gem 'rack-mini-profiler', require: false
 
 # used for caching, optional
 gem 'rack-cors', require: false
-gem 'unicorn', require: false
+gem 'unicorn', platform: :mri, require: false
 gem 'puma', require: false
 gem 'rbtrace', require: false, platform: :mri
 
