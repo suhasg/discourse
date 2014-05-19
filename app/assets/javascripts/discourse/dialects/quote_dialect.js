@@ -5,8 +5,8 @@
 var esc = Handlebars.Utils.escapeExpression;
 
 Discourse.Dialect.replaceBlock({
-  start: new RegExp("\\[quote=?([^\\[\\]]+)?\\]([\\s\\S]*)", "igm"),
-  stop: '[/quote]',
+  start: /\[quote=?([^\[\]]+)?\]([\s\S]*)/igm,
+  stop: /\[\/quote\]/i,
   emitter: function(blockContents, matches, options) {
 
     var params = {'class': 'quote'},
