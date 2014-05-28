@@ -23,6 +23,13 @@ class Plugin::Instance
     @metadata = metadata
     @path = path
     @assets = []
+
+    # Automatically include all ES6 JS files
+    dir = File.dirname(@path)
+    Dir.glob("#{dir}/assets/javascripts/**/*.js.es6") do |f|
+      relative = f.sub("#{dir}/assets/", "")
+      register_asset(relative)
+    end
   end
 
   def name
