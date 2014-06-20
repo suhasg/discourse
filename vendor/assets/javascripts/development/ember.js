@@ -3015,7 +3015,9 @@ define("ember-metal/events",
     var a_slice = [].slice,
         metaFor = meta,
         /* listener flags */
-        ONCE = 1, SUSPENDED = 2;
+        ONCE = 1, SUSPENDED = 2,
+        MAX_NAIVE_ARRAY = 30,
+        indexSeq = 1;
 
 
     /*
@@ -3037,7 +3039,19 @@ define("ember-metal/events",
     */
 
     function indexOf(array, target, method) {
+
       var index = -1;
+
+      if(array._index){
+        var current = array._index[method._seq || method];
+        if(current){
+          var lookup = current[target];
+          if(lookup || lookup === 0){
+            return lookup;
+          }
+        }
+        return -1;
+      }
       // hashes are added to the end of the event array
       // so it makes sense to start searching at the end
       // of the array and search in reverse
@@ -3048,6 +3062,51 @@ define("ember-metal/events",
       }
       return index;
     }
+
+    function rebuildActionIndex(actions){
+      actions._index = {};
+      for(var i = 0; i < actions.length; i += 3){
+        var current = actions._index[actions[i + 1]];
+        if(!current){
+          current = {};
+          actions._index[actions[i + 1]] = current;
+        }
+        current[actions[i]] = i;
+      }
+    }
+
+    function addAction(actions, target, method, flags){
+      actions.push(target, method, flags);
+      if(actions.length > MAX_NAIVE_ARRAY){
+        if(!actions._index){
+          rebuildActionIndex(actions);
+        }
+
+        var id = method;
+        if(typeof(method) === "function"){
+          id = method._seq = method._seq || indexSeq++;
+        }
+
+        var current = actions._index[id];
+        if(!current){
+          current = {};
+          actions._index[id] = current;
+        }
+        current[target] = actions.length - 3;
+      }
+    }
+
+    function removeAction(actions, actionIndex){
+      actions.splice(actionIndex, 3);
+      if(actions._index){
+        if(actions.length > MAX_NAIVE_ARRAY){
+          rebuildActionIndex(actions);
+        } else {
+          actions._index = undefined;
+        }
+      }
+    }
+
 
     function actionsFor(obj, eventName) {
       var meta = metaFor(obj, true),
@@ -3084,7 +3143,7 @@ define("ember-metal/events",
             actionIndex = indexOf(otherActions, target, method);
 
         if (actionIndex === -1) {
-          otherActions.push(target, method, flags);
+          addAction(otherActions, target, method, flags);
         }
       }
     }
@@ -3103,8 +3162,8 @@ define("ember-metal/events",
 
         if (actionIndex !== -1) { continue; }
 
-        otherActions.push(target, method, flags);
-        diffActions.push(target, method, flags);
+        addAction(otherActions, target, method, flags)
+        addAction(diffActions, target, method, flags)
       }
 
       return diffActions;
@@ -3137,7 +3196,7 @@ define("ember-metal/events",
 
       if (actionIndex !== -1) { return; }
 
-      actions.push(target, method, flags);
+      addAction(actions, target, method, flags);
 
       if ('function' === typeof obj.didAddListener) {
         obj.didAddListener(eventName, target, method);
@@ -3171,7 +3230,7 @@ define("ember-metal/events",
         // action doesn't exist, give up silently
         if (actionIndex === -1) { return; }
 
-        actions.splice(actionIndex, 3);
+        removeAction(actions, actionIndex);
 
         if ('function' === typeof obj.didRemoveListener) {
           obj.didRemoveListener(eventName, target, method);
