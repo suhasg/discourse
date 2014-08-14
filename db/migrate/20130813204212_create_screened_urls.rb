@@ -2,7 +2,7 @@ class CreateScreenedUrls < ActiveRecord::Migration
   def change
     create_table :screened_urls do |t|
       t.string :url, null: false
-      t.string :domain, null: false
+      t.string :domain, null: true
       t.integer :action_type, null: false
       t.integer :match_count, null: false, default: 0
       t.datetime :last_match_at
